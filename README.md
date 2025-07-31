@@ -21,4 +21,4 @@
 | 36             | Valid Sudoku                                   | Yes    |
 | 49             | Group Anagram                                  | Yes    |
 | 88             | Merge sorted array                             | Yes    |
-| 
+| 122            | 122 Best Time to Buy and Sell Stock II         | Yes    |
