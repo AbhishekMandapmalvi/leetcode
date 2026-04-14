@@ -1,0 +1,11 @@
+PROBLEM: #1 Two Sum
+DIFFICULTY: Easy
+PATTERNS: HashMap
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(n)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/hashmap/1%20Two%20Sum/1.py
+NOTES: Check-before-insert in hash map — the canonical complement pattern.

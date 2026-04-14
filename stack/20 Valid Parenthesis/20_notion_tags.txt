@@ -1,0 +1,11 @@
+PROBLEM: #20 Valid Parentheses
+DIFFICULTY: Easy
+PATTERNS: Stack, String
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(n)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/stack/20%20Valid%20Parenthesis/20.py
+NOTES: Remove the debug print(ls) inside the loop.

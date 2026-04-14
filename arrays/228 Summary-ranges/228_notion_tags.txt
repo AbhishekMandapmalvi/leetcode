@@ -1,0 +1,11 @@
+PROBLEM: #228 Summary Ranges
+DIFFICULTY: Easy
+PATTERNS: Array, Intervals
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/arrays/228%20Summary-ranges/228.py
+NOTES: Walk + inner run-extension is still amortized O(n).

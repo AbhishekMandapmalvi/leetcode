@@ -1,0 +1,11 @@
+PROBLEM: #217 Contains Duplicate
+DIFFICULTY: Easy
+PATTERNS: HashMap
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(n)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/hashmap/217%20Contains%20Duplicate/217.py
+NOTES: One-liner: len(set(nums)) != len(nums). Solution has dead-code set that's never read.

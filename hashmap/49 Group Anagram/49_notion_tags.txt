@@ -1,0 +1,11 @@
+PROBLEM: #49 Group Anagrams
+DIFFICULTY: Medium
+PATTERNS: HashMap, String
+TIME_COMPLEXITY: O(n*k)
+SPACE_COMPLEXITY: O(n*k)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/hashmap/49%20Group%20Anagram/49.py
+NOTES: Count tuple key (O(k)) beats sorted-string key (O(k log k)). Also had unused result=[].

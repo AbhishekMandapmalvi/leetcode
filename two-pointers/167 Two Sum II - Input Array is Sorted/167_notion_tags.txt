@@ -1,0 +1,11 @@
+PROBLEM: #167 Two Sum II - Input Array is Sorted
+DIFFICULTY: Medium
+PATTERNS: Two Pointers
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/two-pointers/167%20Two%20Sum%20II%20-%20Input%20Array%20is%20Sorted/167.py
+NOTES: Sorted input → two pointers beats hash map (O(1) space).

@@ -1,0 +1,11 @@
+PROBLEM: #125 Valid Palindrome
+DIFFICULTY: Easy
+PATTERNS: Two Pointers, String
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/two-pointers/125%20Valid%20Palindrome/125_2.py
+NOTES: In-place two pointers beats building a cleaned copy — saves O(n) space.

@@ -1,0 +1,11 @@
+PROBLEM: #202 Happy Number
+DIFFICULTY: Easy
+PATTERNS: HashMap, Math
+TIME_COMPLEXITY: O(k)
+SPACE_COMPLEXITY: O(k)
+CONFIDENCE: Medium
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/hashmap/202%20happy-number/202.py
+NOTES: Cycle detection problem. Set is simple; Floyd's tortoise-and-hare is O(1) space.

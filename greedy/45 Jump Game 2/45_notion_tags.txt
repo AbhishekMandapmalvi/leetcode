@@ -1,0 +1,11 @@
+PROBLEM: #45 Jump Game II
+DIFFICULTY: Medium
+PATTERNS: Greedy, Array
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/greedy/45%20Jump%20Game%202/45.py
+NOTES: BFS layers: track end and farthest, commit a jump at end.

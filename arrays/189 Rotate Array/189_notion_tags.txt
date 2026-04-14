@@ -1,0 +1,11 @@
+PROBLEM: #189 Rotate Array
+DIFFICULTY: Medium
+PATTERNS: Array, In-place
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: Medium
+REVISIT: Yes
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/arrays/189%20Rotate%20Array/189.py
+NOTES: Triple reverse is the O(1)-space trick. Slice version uses O(n).

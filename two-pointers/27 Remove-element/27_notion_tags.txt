@@ -1,0 +1,11 @@
+PROBLEM: #27 Remove Element
+DIFFICULTY: Easy
+PATTERNS: Two Pointers, In-place
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: Medium
+REVISIT: Yes
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/two-pointers/27%20Remove-element/27.py
+NOTES: Used list.pop() in a loop → accidentally O(n^2). Use fast/slow pointer overwrite instead.

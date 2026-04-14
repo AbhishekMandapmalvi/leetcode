@@ -1,0 +1,11 @@
+PROBLEM: #290 Word Pattern
+DIFFICULTY: Easy
+PATTERNS: HashMap, String
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(n)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/hashmap/290%20word-pattern/290.py
+NOTES: Same template as LC 205 Isomorphic Strings but on word tokens.

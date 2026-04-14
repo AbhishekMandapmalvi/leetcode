@@ -1,0 +1,11 @@
+PROBLEM: #238 Product of Array Except Self
+DIFFICULTY: Medium
+PATTERNS: Array, Prefix Sum
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/arrays/238%20Product%20of%20Array%20Except%20Self/238.py
+NOTES: Prefix-product pass + suffix-product pass, reuse output array.

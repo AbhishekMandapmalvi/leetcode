@@ -1,0 +1,11 @@
+PROBLEM: #209 Minimum Size Subarray Sum
+DIFFICULTY: Medium
+PATTERNS: Sliding Window
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/sliding-window/209%20minimum-size-subarray-sum/209.py
+NOTES: Expand r, shrink l while sum>=target. Only works when sums are monotone (positive nums).

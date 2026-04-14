@@ -1,0 +1,11 @@
+PROBLEM: #71 Simplify Path
+DIFFICULTY: Medium
+PATTERNS: Stack, String
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(n)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/stack/71%20simplify-path/71%20stack.py
+NOTES: Split on /, push/pop, join — textbook stack pattern.

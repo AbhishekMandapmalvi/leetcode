@@ -1,0 +1,11 @@
+PROBLEM: #141 Linked List Cycle
+DIFFICULTY: Easy
+PATTERNS: Linked List, Two Pointers
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/linked-list/141%20Linked%20List%20Cycle/141.py
+NOTES: Floyd's tortoise and hare — O(1) space.

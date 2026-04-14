@@ -1,0 +1,11 @@
+PROBLEM: #219 Contains Duplicate II
+DIFFICULTY: Easy
+PATTERNS: HashMap, Sliding Window
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(k)
+CONFIDENCE: Medium
+REVISIT: Yes
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/hashmap/219%20contains-duplicate-ii/219.py
+NOTES: "Within k" → sliding-window set of size k (O(k) space). Dict approach works but dead-code branch and uses O(n).

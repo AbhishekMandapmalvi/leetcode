@@ -1,0 +1,11 @@
+PROBLEM: #383 Ransom Note
+DIFFICULTY: Easy
+PATTERNS: HashMap, String
+TIME_COMPLEXITY: O(n+m)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/hashmap/383%20ransom-note/383.py
+NOTES: Counter subtraction one-liner works: not (Counter(r) - Counter(m)).

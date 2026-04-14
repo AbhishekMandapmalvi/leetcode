@@ -1,0 +1,11 @@
+PROBLEM: #15 3Sum
+DIFFICULTY: Medium
+PATTERNS: Two Pointers, Sorting
+TIME_COMPLEXITY: O(n^2)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: Medium
+REVISIT: Yes
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/two-pointers/15%203Sum/15.py
+NOTES: Used hash set instead of two pointers after sorting — works but wastes O(n) space.

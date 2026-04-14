@@ -1,0 +1,11 @@
+PROBLEM: #14 Longest Common Prefix
+DIFFICULTY: Easy
+PATTERNS: Array, String
+TIME_COMPLEXITY: O(n log n * k)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/arrays/14%20Longest-common-prefix/14.py
+NOTES: After sorting, only first and last string matter — middles are bounded by them.

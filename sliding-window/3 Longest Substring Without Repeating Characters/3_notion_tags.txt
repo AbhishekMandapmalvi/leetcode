@@ -1,0 +1,11 @@
+PROBLEM: #3 Longest Substring Without Repeating Characters
+DIFFICULTY: Medium
+PATTERNS: Sliding Window, HashMap
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: Medium
+REVISIT: Yes
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/sliding-window/3%20Longest%20Substring%20Without%20Repeating%20Characters/3%20O(N).py
+NOTES: Use last-seen dict to jump l past duplicates. Rebuilding a temp list is wasteful.

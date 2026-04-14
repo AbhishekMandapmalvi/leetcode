@@ -1,0 +1,11 @@
+PROBLEM: #56 Merge Intervals
+DIFFICULTY: Medium
+PATTERNS: Array, Intervals, Sorting
+TIME_COMPLEXITY: O(n log n)
+SPACE_COMPLEXITY: O(n)
+CONFIDENCE: Medium
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/arrays/56%20Merge-intervals/56.py
+NOTES: One overlap check, extend end with max — don't split into multiple cases.

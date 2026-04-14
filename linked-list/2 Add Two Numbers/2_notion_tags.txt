@@ -1,0 +1,11 @@
+PROBLEM: #2 Add Two Numbers
+DIFFICULTY: Medium
+PATTERNS: Linked List
+TIME_COMPLEXITY: O(max(m,n))
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/linked-list/2%20Add%20Two%20Numbers/2.py
+NOTES: Use `while l1 or l2 or carry` to fold trailing carry into the loop.

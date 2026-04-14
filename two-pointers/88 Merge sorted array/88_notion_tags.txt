@@ -1,0 +1,11 @@
+PROBLEM: #88 Merge Sorted Array
+DIFFICULTY: Easy
+PATTERNS: Two Pointers, Merge
+TIME_COMPLEXITY: O(m+n)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: Medium
+REVISIT: Yes
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/two-pointers/88%20Merge%20sorted%20array/88.py
+NOTES: Merge from the BACK of nums1 to avoid overwriting unread elements — I did an O((m+n)^2) bubble instead.

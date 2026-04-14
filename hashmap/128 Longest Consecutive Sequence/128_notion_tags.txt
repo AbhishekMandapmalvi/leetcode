@@ -1,0 +1,11 @@
+PROBLEM: #128 Longest Consecutive Sequence
+DIFFICULTY: Medium
+PATTERNS: HashMap
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(n)
+CONFIDENCE: Medium
+REVISIT: Yes
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/hashmap/128%20Longest%20Consecutive%20Sequence/128.py
+NOTES: Use set + only count from run heads (x where x-1 not in set). Simpler than boundary-patching.

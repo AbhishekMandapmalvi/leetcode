@@ -1,6 +1,12 @@
-﻿################################################################################
+################################################################################
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
 /.vs/leetcode
 /.vs
+.vscode/
+
+# Claude Code / workflow artifacts
+.claude/
+**/memory/
+**/_notion_tags.txt

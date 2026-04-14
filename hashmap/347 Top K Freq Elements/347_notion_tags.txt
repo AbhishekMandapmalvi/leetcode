@@ -1,0 +1,11 @@
+PROBLEM: #347 Top K Frequent Elements
+DIFFICULTY: Medium
+PATTERNS: HashMap, Heap
+TIME_COMPLEXITY: O(n log k)
+SPACE_COMPLEXITY: O(n)
+CONFIDENCE: High
+REVISIT: Yes
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/hashmap/347%20Top%20K%20Freq%20Elements/347.py
+NOTES: Heap is fine; bucket sort is O(n) when frequencies are bounded by n — know both.

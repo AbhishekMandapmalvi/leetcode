@@ -1,0 +1,11 @@
+PROBLEM: #151 Reverse Words in a String
+DIFFICULTY: Medium
+PATTERNS: String, Two Pointers
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(n)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/two-pointers/151%20Reverse-words-in-a-string/151.py
+NOTES: split() with no arg collapses whitespace — don't reimplement it. For follow-up, know the in-place char-array version.

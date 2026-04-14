@@ -1,0 +1,11 @@
+PROBLEM: #11 Container With Most Water
+DIFFICULTY: Medium
+PATTERNS: Two Pointers, Greedy
+TIME_COMPLEXITY: O(n)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/two-pointers/11%20Container%20with%20most%20water/11.py
+NOTES: Always move the pointer at the shorter wall — the taller side can't produce a bigger area.

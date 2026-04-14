@@ -1,0 +1,11 @@
+PROBLEM: #36 Valid Sudoku
+DIFFICULTY: Medium
+PATTERNS: HashMap, Matrix
+TIME_COMPLEXITY: O(1)
+SPACE_COMPLEXITY: O(1)
+CONFIDENCE: High
+REVISIT: No
+STATUS: Done
+DATE: 2026-04-13
+GITHUB: https://github.com/AbhishekMandapmalvi/leetcode/blob/main/hashmap/36%20Valid%20Sudoku/36.py
+NOTES: box_idx = (r//3)*3 + c//3 — memorize the subgrid formula.
