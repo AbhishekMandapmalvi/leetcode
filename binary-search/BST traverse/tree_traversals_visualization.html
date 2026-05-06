@@ -1,0 +1,407 @@
+<h2 class="sr-only">Interactive visualization of inorder, preorder, and postorder tree traversals showing the order nodes are visited</h2>
+
+<div style="padding: 1rem 0;">
+
+  <div style="display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; align-items: center;">
+    <label style="font-size: 13px; color: var(--color-text-secondary);">Traversal:</label>
+    <select id="modeSelect" style="width: 110px;">
+      <option value="inorder" selected>Inorder</option>
+      <option value="preorder">Preorder</option>
+      <option value="postorder">Postorder</option>
+    </select>
+    <button id="runBtn">▶ Run</button>
+    <button id="stepBtn">Step ▸</button>
+    <button id="resetBtn">↺ Reset</button>
+    <span style="font-size: 13px; color: var(--color-text-secondary); margin-left: auto;">Speed</span>
+    <input type="range" id="speed" min="200" max="1500" value="700" step="100" style="width: 100px;" />
+  </div>
+
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1rem; margin-bottom: 1rem;">
+    <svg id="tree" viewBox="0 0 660 340" style="width: 100%; height: 340px;"></svg>
+    <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; font-size: 12px; color: var(--color-text-secondary); margin-top: 8px;">
+      <span><span style="display: inline-block; width: 12px; height: 12px; background: #FAC775; border: 1px solid #854F0B; border-radius: 50%; vertical-align: middle;"></span> currently visiting</span>
+      <span><span style="display: inline-block; width: 12px; height: 12px; background: #CECBF6; border: 1px solid #534AB7; border-radius: 50%; vertical-align: middle;"></span> on call stack</span>
+      <span><span style="display: inline-block; width: 12px; height: 12px; background: #9FE1CB; border: 1px solid #0F6E56; border-radius: 50%; vertical-align: middle;"></span> printed</span>
+    </div>
+  </div>
+
+  <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px; margin-bottom: 1rem;">
+    <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px;">Output</div>
+    <div id="output" style="font-size: 16px; font-family: var(--font-mono); font-weight: 500; min-height: 24px; letter-spacing: 2px;">—</div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem;">
+    <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px;">
+      <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px;">Current step</div>
+      <div id="status" style="font-size: 14px; font-weight: 500; min-height: 40px; line-height: 1.4;">Pick a traversal and press Run.</div>
+    </div>
+    <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px;">
+      <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px;">Call stack</div>
+      <div id="stack" style="font-size: 12px; font-family: var(--font-mono); min-height: 40px; line-height: 1.5;">—</div>
+    </div>
+  </div>
+
+  <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px; font-family: var(--font-mono); font-size: 12px; line-height: 1.6;" id="codeBox"></div>
+
+</div>
+
+<script>
+(function(){
+
+  const codeMap = {
+    inorder: [
+      'def inorder(root):',
+      '    if not root:',
+      '        return',
+      '    inorder(root.left)',
+      '    print(root.val)',
+      '    inorder(root.right)'
+    ],
+    preorder: [
+      'def preorder(root):',
+      '    if not root:',
+      '        return',
+      '    print(root.val)',
+      '    preorder(root.left)',
+      '    preorder(root.right)'
+    ],
+    postorder: [
+      'def postorder(root):',
+      '    if not root:',
+      '        return',
+      '    postorder(root.left)',
+      '    postorder(root.right)',
+      '    print(root.val)'
+    ]
+  };
+
+  const codeBox = document.getElementById('codeBox');
+
+  function renderCode(mode) {
+    codeBox.innerHTML = '';
+    codeMap[mode].forEach((l, i) => {
+      const d = document.createElement('div');
+      d.id = 'line-' + i;
+      d.textContent = l || '\u00A0';
+      d.style.padding = '1px 6px';
+      d.style.borderRadius = '3px';
+      d.style.whiteSpace = 'pre';
+      codeBox.appendChild(d);
+    });
+  }
+
+  let nodeId = 0;
+  function makeNode(v, l, r) { return { id: nodeId++, val: v, left: l, right: r }; }
+  function buildTree() {
+    nodeId = 0;
+    return makeNode('A',
+      makeNode('B',
+        makeNode('D', null, null),
+        makeNode('E', null, null)),
+      makeNode('C',
+        makeNode('F', null, null),
+        makeNode('G', null, null))
+    );
+  }
+
+  const tree = buildTree();
+  const positions = new Map();
+
+  function layout(node, depth=0, x=330, spread=160) {
+    if (!node) return;
+    positions.set(node.id, { x, y: 50 + depth*80 });
+    layout(node.left, depth+1, x - spread, spread*0.55);
+    layout(node.right, depth+1, x + spread, spread*0.55);
+  }
+  layout(tree);
+
+  const svg = document.getElementById('tree');
+
+  function renderTree(state) {
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    drawEdges(tree);
+    drawNodes(tree, state);
+  }
+
+  function drawEdges(node) {
+    if (!node) return;
+    const p = positions.get(node.id);
+    [node.left, node.right].forEach(child => {
+      if (child) {
+        const c = positions.get(child.id);
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', p.x); line.setAttribute('y1', p.y);
+        line.setAttribute('x2', c.x); line.setAttribute('y2', c.y);
+        line.setAttribute('stroke', '#888780');
+        line.setAttribute('stroke-width', '1.5');
+        svg.appendChild(line);
+        drawEdges(child);
+      }
+    });
+  }
+
+  function drawNodes(node, state) {
+    if (!node) return;
+    const p = positions.get(node.id);
+    let fill = '#FFFFFF', stroke = '#888780', textColor = '#2C2C2A', strokeW = '1.5';
+
+    if (state.current === node.id) {
+      fill = '#FAC775'; stroke = '#854F0B'; textColor = '#412402'; strokeW = '2';
+    } else if (state.printed.has(node.id)) {
+      fill = '#9FE1CB'; stroke = '#0F6E56'; textColor = '#04342C';
+    } else if (state.stack.includes(node.id)) {
+      fill = '#CECBF6'; stroke = '#534AB7'; textColor = '#26215C';
+    }
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', p.x); circle.setAttribute('cy', p.y);
+    circle.setAttribute('r', 22);
+    circle.setAttribute('fill', fill);
+    circle.setAttribute('stroke', stroke);
+    circle.setAttribute('stroke-width', strokeW);
+    svg.appendChild(circle);
+
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', p.x); text.setAttribute('y', p.y + 5);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('font-size', '15');
+    text.setAttribute('font-weight', '500');
+    text.setAttribute('fill', textColor);
+    text.setAttribute('font-family', 'var(--font-sans)');
+    text.textContent = node.val;
+    svg.appendChild(text);
+
+    drawNodes(node.left, state);
+    drawNodes(node.right, state);
+  }
+
+  let steps = [];
+  let stepIdx = 0;
+  let running = false;
+  let timer = null;
+
+  function highlightLine(idx) {
+    const mode = document.getElementById('modeSelect').value;
+    codeMap[mode].forEach((_, i) => {
+      const el = document.getElementById('line-' + i);
+      if (!el) return;
+      if (i === idx) {
+        el.style.background = 'var(--color-background-info)';
+        el.style.color = 'var(--color-text-info)';
+      } else {
+        el.style.background = 'transparent';
+        el.style.color = 'var(--color-text-primary)';
+      }
+    });
+  }
+
+  // Snapshot helpers
+  function snap(stack, printed) {
+    return { stack: [...stack], printed: new Set(printed) };
+  }
+
+  function pushStep(s) { steps.push(s); }
+
+  function simulate(mode, node, stack, printed) {
+    const fnName = mode;
+    const callArg = node ? node.val : 'None';
+
+    if (!node) {
+      // Entered a None call — show momentarily
+      const tempStack = [...stack];
+      pushStep({
+        line: 1, status: `Call ${fnName}(None) — base case, return.`,
+        current: null, stack: [...tempStack], printed: new Set(printed),
+        callStackText: [...stack.map(id => stackLabel(mode, id)), `${fnName}(None)`]
+      });
+      return;
+    }
+
+    const newStack = [...stack, node.id];
+
+    // Step: enter function
+    pushStep({
+      line: 0, status: `Call ${fnName}(${node.val}).`,
+      current: node.id, stack: newStack, printed: new Set(printed),
+      callStackText: newStack.map(id => stackLabel(mode, id))
+    });
+    pushStep({
+      line: 1, status: `${node.val} is not None — continue.`,
+      current: node.id, stack: newStack, printed: new Set(printed),
+      callStackText: newStack.map(id => stackLabel(mode, id))
+    });
+
+    if (mode === 'inorder') {
+      pushStep({
+        line: 3, status: `Recurse left into ${node.left ? node.left.val : 'None'}.`,
+        current: node.id, stack: newStack, printed: new Set(printed),
+        callStackText: newStack.map(id => stackLabel(mode, id))
+      });
+      simulate(mode, node.left, newStack, printed);
+
+      printed.add(node.id);
+      pushStep({
+        line: 4, status: `Print ${node.val}.`,
+        current: node.id, stack: newStack, printed: new Set(printed),
+        callStackText: newStack.map(id => stackLabel(mode, id))
+      });
+
+      pushStep({
+        line: 5, status: `Recurse right into ${node.right ? node.right.val : 'None'}.`,
+        current: node.id, stack: newStack, printed: new Set(printed),
+        callStackText: newStack.map(id => stackLabel(mode, id))
+      });
+      simulate(mode, node.right, newStack, printed);
+
+    } else if (mode === 'preorder') {
+      printed.add(node.id);
+      pushStep({
+        line: 3, status: `Print ${node.val}.`,
+        current: node.id, stack: newStack, printed: new Set(printed),
+        callStackText: newStack.map(id => stackLabel(mode, id))
+      });
+
+      pushStep({
+        line: 4, status: `Recurse left into ${node.left ? node.left.val : 'None'}.`,
+        current: node.id, stack: newStack, printed: new Set(printed),
+        callStackText: newStack.map(id => stackLabel(mode, id))
+      });
+      simulate(mode, node.left, newStack, printed);
+
+      pushStep({
+        line: 5, status: `Recurse right into ${node.right ? node.right.val : 'None'}.`,
+        current: node.id, stack: newStack, printed: new Set(printed),
+        callStackText: newStack.map(id => stackLabel(mode, id))
+      });
+      simulate(mode, node.right, newStack, printed);
+
+    } else { // postorder
+      pushStep({
+        line: 3, status: `Recurse left into ${node.left ? node.left.val : 'None'}.`,
+        current: node.id, stack: newStack, printed: new Set(printed),
+        callStackText: newStack.map(id => stackLabel(mode, id))
+      });
+      simulate(mode, node.left, newStack, printed);
+
+      pushStep({
+        line: 4, status: `Recurse right into ${node.right ? node.right.val : 'None'}.`,
+        current: node.id, stack: newStack, printed: new Set(printed),
+        callStackText: newStack.map(id => stackLabel(mode, id))
+      });
+      simulate(mode, node.right, newStack, printed);
+
+      printed.add(node.id);
+      pushStep({
+        line: 5, status: `Print ${node.val}.`,
+        current: node.id, stack: newStack, printed: new Set(printed),
+        callStackText: newStack.map(id => stackLabel(mode, id))
+      });
+    }
+
+    // Step: returning
+    pushStep({
+      line: 0, status: `Return from ${fnName}(${node.val}).`,
+      current: null, stack: stack, printed: new Set(printed),
+      callStackText: stack.map(id => stackLabel(mode, id))
+    });
+  }
+
+  function stackLabel(mode, id) {
+    const node = findById(tree, id);
+    return `${mode}(${node ? node.val : '?'})`;
+  }
+
+  function findById(node, id) {
+    if (!node) return null;
+    if (node.id === id) return node;
+    return findById(node.left, id) || findById(node.right, id);
+  }
+
+  function reset() {
+    if (timer) clearTimeout(timer);
+    running = false;
+    steps = [];
+    stepIdx = 0;
+    const mode = document.getElementById('modeSelect').value;
+    renderCode(mode);
+    renderTree({ current: null, stack: [], printed: new Set() });
+    highlightLine(-1);
+    document.getElementById('status').textContent = 'Pick a traversal and press Run.';
+    document.getElementById('stack').textContent = '—';
+    document.getElementById('output').textContent = '—';
+    document.getElementById('runBtn').textContent = '▶ Run';
+  }
+
+  function prepareRun() {
+    steps = [];
+    stepIdx = 0;
+    const mode = document.getElementById('modeSelect').value;
+    simulate(mode, tree, [], new Set());
+  }
+
+  function applyStep(s) {
+    renderTree({ current: s.current, stack: s.stack, printed: s.printed });
+    highlightLine(s.line);
+    document.getElementById('status').textContent = s.status;
+    document.getElementById('stack').innerHTML = s.callStackText.slice().reverse().map((f, i) =>
+      `<div style="${i === 0 ? 'color: var(--color-text-info); font-weight: 500;' : 'color: var(--color-text-secondary);'}">${f}</div>`
+    ).join('') || '—';
+
+    // Build output from printed set, in insertion order
+    const printedOrder = [];
+    // We need ordered output — track by step iteration
+    // Since Set preserves insertion order in JS, Array.from works
+    Array.from(s.printed).forEach(id => {
+      const n = findById(tree, id);
+      if (n) printedOrder.push(n.val);
+    });
+    document.getElementById('output').textContent = printedOrder.length ? printedOrder.join(' → ') : '—';
+  }
+
+  function nextStep() {
+    if (stepIdx >= steps.length) {
+      running = false;
+      document.getElementById('runBtn').textContent = '▶ Run';
+      return false;
+    }
+    applyStep(steps[stepIdx]);
+    stepIdx++;
+    return true;
+  }
+
+  function run() {
+    if (steps.length === 0) prepareRun();
+    running = true;
+    document.getElementById('runBtn').textContent = '⏸ Pause';
+    const tick = () => {
+      if (!running) return;
+      if (!nextStep()) return;
+      const delay = 1700 - parseInt(document.getElementById('speed').value);
+      timer = setTimeout(tick, delay);
+    };
+    tick();
+  }
+
+  document.getElementById('runBtn').addEventListener('click', () => {
+    if (running) {
+      running = false;
+      if (timer) clearTimeout(timer);
+      document.getElementById('runBtn').textContent = '▶ Run';
+      return;
+    }
+    if (stepIdx >= steps.length) { reset(); prepareRun(); }
+    run();
+  });
+  document.getElementById('stepBtn').addEventListener('click', () => {
+    if (steps.length === 0) prepareRun();
+    running = false;
+    if (timer) clearTimeout(timer);
+    document.getElementById('runBtn').textContent = '▶ Run';
+    nextStep();
+  });
+  document.getElementById('resetBtn').addEventListener('click', reset);
+  document.getElementById('modeSelect').addEventListener('change', reset);
+
+  reset();
+})();
+</script>

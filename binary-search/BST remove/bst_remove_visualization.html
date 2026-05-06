@@ -1,0 +1,403 @@
+<h2 class="sr-only">Interactive visualization of binary search tree node removal algorithm with step-by-step traversal and three deletion cases</h2>
+
+<div style="padding: 1rem 0;">
+
+  <div style="display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; align-items: center;">
+    <label style="font-size: 13px; color: var(--color-text-secondary);">Remove value:</label>
+    <select id="valSelect" style="width: 90px;">
+      <option value="3">3 (leaf)</option>
+      <option value="7">7 (leaf)</option>
+      <option value="15" selected>15 (leaf)</option>
+      <option value="5">5 (two kids)</option>
+      <option value="10">10 (two kids)</option>
+      <option value="40">40 (one kid)</option>
+      <option value="20">20 (root)</option>
+    </select>
+    <button id="runBtn">▶ Run</button>
+    <button id="stepBtn">Step ▸</button>
+    <button id="resetBtn">↺ Reset</button>
+    <span style="font-size: 13px; color: var(--color-text-secondary); margin-left: auto;">Speed</span>
+    <input type="range" id="speed" min="300" max="1500" value="800" step="100" style="width: 100px;" />
+  </div>
+
+  <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1rem; margin-bottom: 1rem;">
+    <svg id="tree" viewBox="0 0 660 340" style="width: 100%; height: 340px;"></svg>
+    <div style="display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; font-size: 12px; color: var(--color-text-secondary); margin-top: 8px;">
+      <span><span style="display: inline-block; width: 12px; height: 12px; background: #CECBF6; border: 1px solid #534AB7; border-radius: 50%; vertical-align: middle;"></span> visited</span>
+      <span><span style="display: inline-block; width: 12px; height: 12px; background: #FAC775; border: 1px solid #854F0B; border-radius: 50%; vertical-align: middle;"></span> current</span>
+      <span><span style="display: inline-block; width: 12px; height: 12px; background: #F7C1C1; border: 1px solid #A32D2D; border-radius: 50%; vertical-align: middle;"></span> target</span>
+      <span><span style="display: inline-block; width: 12px; height: 12px; background: #9FE1CB; border: 1px solid #0F6E56; border-radius: 50%; vertical-align: middle;"></span> successor</span>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem;">
+    <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px;">
+      <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px;">Current step</div>
+      <div id="status" style="font-size: 14px; font-weight: 500; min-height: 40px; line-height: 1.4;">Pick a value and press Run.</div>
+    </div>
+    <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px;">
+      <div style="font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px;">Call stack</div>
+      <div id="stack" style="font-size: 12px; font-family: var(--font-mono); min-height: 40px; line-height: 1.5;">—</div>
+    </div>
+  </div>
+
+  <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 12px; font-family: var(--font-mono); font-size: 12px; line-height: 1.6;" id="codeBox"></div>
+
+</div>
+
+<script>
+(function(){
+  const codeLines = [
+    'def remove(root, val):',
+    '    if not root:',
+    '        return None',
+    '    if val > root.val:',
+    '        root.right = remove(root.right, val)',
+    '    elif val < root.val:',
+    '        root.left = remove(root.left, val)',
+    '    else:',
+    '        if not root.left:',
+    '            return root.right',
+    '        elif not root.right:',
+    '            return root.left',
+    '        else:',
+    '            minNode = minValueNode(root.right)',
+    '            root.val = minNode.val',
+    '            root.right = remove(root.right, minNode.val)',
+    '    return root'
+  ];
+
+  const codeBox = document.getElementById('codeBox');
+  codeLines.forEach((l, i) => {
+    const d = document.createElement('div');
+    d.id = 'line-' + i;
+    d.textContent = l || '\u00A0';
+    d.style.padding = '1px 6px';
+    d.style.borderRadius = '3px';
+    d.style.whiteSpace = 'pre';
+    codeBox.appendChild(d);
+  });
+
+  // Build tree with stable IDs so highlights survive simulation
+  let nodeId = 0;
+  function makeNode(v, l, r) {
+    return { id: nodeId++, val: v, left: l, right: r };
+  }
+  function buildTree() {
+    nodeId = 0;
+    return makeNode(20,
+      makeNode(10,
+        makeNode(5, makeNode(3, null, null), makeNode(7, null, null)),
+        makeNode(15, null, null)),
+      makeNode(30,
+        makeNode(25, null, null),
+        makeNode(40, null, makeNode(45, null, null)))
+    );
+  }
+
+  const tree = buildTree();
+  const positions = new Map(); // id -> {x,y}
+
+  function layout(node, depth=0, x=330, spread=150) {
+    if (!node) return;
+    positions.set(node.id, { x, y: 40 + depth*60 });
+    layout(node.left, depth+1, x - spread, spread*0.55);
+    layout(node.right, depth+1, x + spread, spread*0.55);
+  }
+  layout(tree);
+
+  const svg = document.getElementById('tree');
+
+  function renderTree(state) {
+    // state: { highlights: {id -> type}, hidden: Set<id>, valOverride: Map<id,val> }
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    drawEdges(tree, state);
+    drawNodes(tree, state);
+  }
+
+  function drawEdges(node, state) {
+    if (!node || state.hidden.has(node.id)) return;
+    const p = positions.get(node.id);
+    [node.left, node.right].forEach(child => {
+      if (child && !state.hidden.has(child.id)) {
+        const c = positions.get(child.id);
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', p.x); line.setAttribute('y1', p.y);
+        line.setAttribute('x2', c.x); line.setAttribute('y2', c.y);
+        line.setAttribute('stroke', '#888780');
+        line.setAttribute('stroke-width', '1.5');
+        svg.appendChild(line);
+        drawEdges(child, state);
+      }
+    });
+  }
+
+  function drawNodes(node, state) {
+    if (!node) return;
+    const p = positions.get(node.id);
+    const isHidden = state.hidden.has(node.id);
+    const type = state.highlights[node.id];
+
+    let fill = '#FFFFFF', stroke = '#888780', textColor = '#2C2C2A', opacity = 1;
+    if (isHidden) { opacity = 0.25; fill = '#F7C1C1'; stroke = '#A32D2D'; }
+    else if (type === 'current') { fill = '#FAC775'; stroke = '#854F0B'; textColor = '#412402'; }
+    else if (type === 'successor') { fill = '#9FE1CB'; stroke = '#0F6E56'; textColor = '#04342C'; }
+    else if (type === 'target') { fill = '#F7C1C1'; stroke = '#A32D2D'; textColor = '#501313'; }
+    else if (type === 'visited') { fill = '#CECBF6'; stroke = '#534AB7'; textColor = '#26215C'; }
+
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('opacity', opacity);
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', p.x); circle.setAttribute('cy', p.y);
+    circle.setAttribute('r', 19);
+    circle.setAttribute('fill', fill);
+    circle.setAttribute('stroke', stroke);
+    circle.setAttribute('stroke-width', type ? '2' : '1.5');
+    g.appendChild(circle);
+
+    const displayVal = state.valOverride.has(node.id) ? state.valOverride.get(node.id) : node.val;
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', p.x); text.setAttribute('y', p.y + 4);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('font-size', '13');
+    text.setAttribute('font-weight', '500');
+    text.setAttribute('fill', textColor);
+    text.setAttribute('font-family', 'var(--font-sans)');
+    text.textContent = displayVal;
+    g.appendChild(text);
+
+    svg.appendChild(g);
+    drawNodes(node.left, state);
+    drawNodes(node.right, state);
+  }
+
+  // Generate steps without mutating the actual tree — use parallel sim
+  let steps = [];
+  let stepIdx = 0;
+  let running = false;
+  let timer = null;
+
+  function highlightLine(idx) {
+    codeLines.forEach((_, i) => {
+      const el = document.getElementById('line-' + i);
+      if (i === idx) {
+        el.style.background = 'var(--color-background-info)';
+        el.style.color = 'var(--color-text-info)';
+      } else {
+        el.style.background = 'transparent';
+        el.style.color = 'var(--color-text-primary)';
+      }
+    });
+  }
+
+  // Find a node by value via BST search (used for successor lookup in original tree)
+  function findInorderSuccessorNode(node) {
+    let cur = node.right;
+    if (!cur) return null;
+    while (cur.left) cur = cur.left;
+    return cur;
+  }
+
+  function pushStep(s) { steps.push(s); }
+
+  function simulate(node, val, path, stack, hidden, valOverride) {
+    const newStack = [...stack, `remove(${node ? node.val : 'None'}, ${val})`];
+
+    if (!node) {
+      pushStep({ line: 1, status: `Node is None — return None.`,
+                 highlights: pathHighlights(path), hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+      return null;
+    }
+
+    const visitedHL = pathHighlights(path);
+    visitedHL[node.id] = 'current';
+
+    pushStep({ line: 0, status: `Call remove on node ${node.val}.`,
+               highlights: visitedHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+    pushStep({ line: 1, status: `Node ${node.val} is not None — continue.`,
+               highlights: visitedHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+
+    const newPath = [...path, node];
+
+    if (val > node.val) {
+      pushStep({ line: 3, status: `${val} > ${node.val} — search right.`,
+                 highlights: visitedHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+      pushStep({ line: 4, status: `Recurse: remove(${val}) on right child.`,
+                 highlights: visitedHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+      simulate(node.right, val, newPath, newStack, hidden, valOverride);
+    } else if (val < node.val) {
+      pushStep({ line: 5, status: `${val} < ${node.val} — search left.`,
+                 highlights: visitedHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+      pushStep({ line: 6, status: `Recurse: remove(${val}) on left child.`,
+                 highlights: visitedHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+      simulate(node.left, val, newPath, newStack, hidden, valOverride);
+    } else {
+      // Found target
+      const targetHL = pathHighlights(path);
+      targetHL[node.id] = 'target';
+      pushStep({ line: 7, status: `Found target node ${node.val}!`,
+                 highlights: targetHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+
+      if (!node.left && !node.right) {
+        pushStep({ line: 8, status: `${node.val} is a leaf — return None.`,
+                   highlights: targetHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+        const newHidden = new Set(hidden); newHidden.add(node.id);
+        pushStep({ line: 9, status: `Node ${node.val} removed.`,
+                   highlights: pathHighlights(path), hidden: newHidden, valOverride: new Map(valOverride), stack: newStack });
+        return;
+      } else if (!node.left) {
+        pushStep({ line: 8, status: `No left child — return right child (${node.right.val}).`,
+                   highlights: targetHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+        const newHidden = new Set(hidden); newHidden.add(node.id);
+        pushStep({ line: 9, status: `Node ${node.val} replaced by ${node.right.val}.`,
+                   highlights: pathHighlights(path), hidden: newHidden, valOverride: new Map(valOverride), stack: newStack });
+        return;
+      } else if (!node.right) {
+        pushStep({ line: 10, status: `No right child — return left child (${node.left.val}).`,
+                   highlights: targetHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+        const newHidden = new Set(hidden); newHidden.add(node.id);
+        pushStep({ line: 11, status: `Node ${node.val} replaced by ${node.left.val}.`,
+                   highlights: pathHighlights(path), hidden: newHidden, valOverride: new Map(valOverride), stack: newStack });
+        return;
+      } else {
+        // Two children
+        pushStep({ line: 12, status: `Two children — find inorder successor.`,
+                   highlights: targetHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+
+        const succ = findInorderSuccessorNode(node);
+        const succHL = pathHighlights(path);
+        succHL[node.id] = 'target';
+        succHL[succ.id] = 'successor';
+        pushStep({ line: 13, status: `Smallest in right subtree is ${succ.val}.`,
+                   highlights: succHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+
+        const newOverride = new Map(valOverride);
+        newOverride.set(node.id, succ.val);
+        const overwriteHL = pathHighlights(path);
+        overwriteHL[node.id] = 'current';
+        overwriteHL[succ.id] = 'successor';
+        pushStep({ line: 14, status: `Copy ${succ.val} into target node (was ${node.val}).`,
+                   highlights: overwriteHL, hidden: new Set(hidden), valOverride: newOverride, stack: newStack });
+
+        pushStep({ line: 15, status: `Now delete ${succ.val} from right subtree.`,
+                   highlights: overwriteHL, hidden: new Set(hidden), valOverride: newOverride, stack: newStack });
+
+        // Recurse into right subtree to delete the successor (by id, not by traversing)
+        simulateRemoveById(node.right, succ.id, newPath, newStack, hidden, newOverride);
+        return;
+      }
+    }
+  }
+
+  // Simplified version that finds node by id (used for successor removal)
+  function simulateRemoveById(node, targetId, path, stack, hidden, valOverride) {
+    if (!node) return;
+    const newStack = [...stack, `remove(${node.val}, successor)`];
+    const visitedHL = pathHighlights(path);
+    visitedHL[node.id] = 'current';
+    pushStep({ line: 0, status: `Call remove on node ${node.val} (looking for successor).`,
+               highlights: visitedHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+
+    if (node.id === targetId) {
+      const tHL = pathHighlights(path);
+      tHL[node.id] = 'target';
+      pushStep({ line: 7, status: `Found successor ${node.val} — remove it.`,
+                 highlights: tHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+      const newHidden = new Set(hidden); newHidden.add(node.id);
+      // Successor has no left child; its right child (if any) takes its place
+      const replacement = node.right ? node.val + ' → ' + node.right.val : node.val + ' → None';
+      pushStep({ line: 8, status: `Successor has no left child — return right child.`,
+                 highlights: tHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+      pushStep({ line: 9, status: `Successor removed (${replacement}).`,
+                 highlights: pathHighlights(path), hidden: newHidden, valOverride: new Map(valOverride), stack: newStack });
+      return;
+    }
+
+    // Successor is always smallest in right subtree, so we go left
+    pushStep({ line: 5, status: `Successor < ${node.val} — search left.`,
+               highlights: visitedHL, hidden: new Set(hidden), valOverride: new Map(valOverride), stack: newStack });
+    simulateRemoveById(node.left, targetId, [...path, node], newStack, hidden, valOverride);
+  }
+
+  function pathHighlights(path) {
+    const h = {};
+    path.forEach(n => { h[n.id] = 'visited'; });
+    return h;
+  }
+
+  function reset() {
+    if (timer) clearTimeout(timer);
+    running = false;
+    steps = [];
+    stepIdx = 0;
+    renderTree({ highlights: {}, hidden: new Set(), valOverride: new Map() });
+    highlightLine(-1);
+    document.getElementById('status').textContent = 'Pick a value and press Run.';
+    document.getElementById('stack').textContent = '—';
+    document.getElementById('runBtn').textContent = '▶ Run';
+  }
+
+  function prepareRun() {
+    steps = [];
+    stepIdx = 0;
+    const val = parseInt(document.getElementById('valSelect').value);
+    simulate(tree, val, [], [], new Set(), new Map());
+  }
+
+  function applyStep(s) {
+    renderTree({ highlights: s.highlights, hidden: s.hidden, valOverride: s.valOverride });
+    highlightLine(s.line);
+    document.getElementById('status').textContent = s.status;
+    document.getElementById('stack').innerHTML = s.stack.slice().reverse().map((f, i) =>
+      `<div style="${i === 0 ? 'color: var(--color-text-info); font-weight: 500;' : 'color: var(--color-text-secondary);'}">${f}</div>`
+    ).join('');
+  }
+
+  function nextStep() {
+    if (stepIdx >= steps.length) {
+      running = false;
+      document.getElementById('runBtn').textContent = '▶ Run';
+      return false;
+    }
+    applyStep(steps[stepIdx]);
+    stepIdx++;
+    return true;
+  }
+
+  function run() {
+    if (steps.length === 0) prepareRun();
+    running = true;
+    document.getElementById('runBtn').textContent = '⏸ Pause';
+    const tick = () => {
+      if (!running) return;
+      if (!nextStep()) return;
+      const delay = 1800 - parseInt(document.getElementById('speed').value);
+      timer = setTimeout(tick, delay);
+    };
+    tick();
+  }
+
+  document.getElementById('runBtn').addEventListener('click', () => {
+    if (running) {
+      running = false;
+      if (timer) clearTimeout(timer);
+      document.getElementById('runBtn').textContent = '▶ Run';
+      return;
+    }
+    if (stepIdx >= steps.length) { reset(); prepareRun(); }
+    run();
+  });
+  document.getElementById('stepBtn').addEventListener('click', () => {
+    if (steps.length === 0) prepareRun();
+    running = false;
+    if (timer) clearTimeout(timer);
+    document.getElementById('runBtn').textContent = '▶ Run';
+    nextStep();
+  });
+  document.getElementById('resetBtn').addEventListener('click', reset);
+  document.getElementById('valSelect').addEventListener('change', reset);
+
+  reset();
+})();
+</script>
